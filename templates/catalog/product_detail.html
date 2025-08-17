@@ -1,0 +1,44 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        {% else %}
+        <img src="https://via.placeholder.com/500x500?text=No+Image" class="img-fluid rounded" alt="No image">
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <h1>{{ product.name }}</h1>
+        <h3 class="text-primary">{{ product.price }} руб.</h3>
+        <p class="text-muted">Категория: {{ product.category.name }}</p>
+        
+        <h4 class="mt-4">Описание</h4>
+        <p>{{ product.description }}</p>
+        
+        <div class="mt-4">
+            <button class="btn btn-primary btn-lg">Добавить в корзину</button>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5">
+    <h3>Характеристики</h3>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">Дата добавления</th>
+                <td>{{ product.created_at|date:"d.m.Y" }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Дата обновления</th>
+                <td>{{ product.updated_at|date:"d.m.Y" }}</td>
+            </tr>
+            <!-- Место для дополнительных характеристик -->
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Каталог{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Каталог товаров</h1>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card mb-4">
+            <div class="card-header">
+                Категории
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item {% if not request.GET.category %}active{% endif %}">
+                    <a href="{% url 'catalog:catalog' %}" class="text-decoration-none">Все товары</a>
+                </li>
+                {% for category in categories %}
+                <li class="list-group-item {% if request.GET.category == category.id|stringformat:'s' %}active{% endif %}">
+                    <a href="{% url 'catalog:catalog' %}?category={{ category.id }}" 
+                       class="text-decoration-none">
+                       {{ category.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card product-card">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top product-img" alt="No image">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text">{{ product.price }} руб.</p>
+                        <a href="{% url 'catalog:product_detail' product.id %}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">Товары не найдены.</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
