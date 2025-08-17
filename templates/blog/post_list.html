@@ -1,0 +1,42 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Технический блог{% endblock %}
+
+{% block content %}
+<div class="blog-header text-center mb-5">
+    <div class="container">
+        <h1 class="display-4">TechBlog</h1>
+        <p class="lead">Новости и обзоры из мира технологий и смартфонов</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% for post in posts %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card post-card h-100">
+                {% if post.preview %}
+                <img src="{{ post.preview.url }}" class="card-img-top post-preview" alt="{{ post.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text text-muted">
+                        <small>
+                            {{ post.created_at|date:"d.m.Y" }} | 
+                            <i class="bi bi-eye"></i> {{ post.views_count }}
+                        </small>
+                    </p>
+                    <a href="{% url 'blog:post_detail' post.pk %}" class="btn btn-primary-custom mt-3">
+                        Читать далее
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">Нет записей в блоге.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
