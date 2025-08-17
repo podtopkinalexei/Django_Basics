@@ -1,30 +1,40 @@
-from django.shortcuts import render, get_object_or_404
+from django.views.generic import ListView, DetailView, TemplateView
+from django.shortcuts import get_object_or_404
 from catalog.models import Product, Category
 
-def index(request):
-    products = Product.objects.all()[:6]
-    return render(request, 'index.html', {'products': products})
+
+class IndexView(ListView):
+    model = Product
+    template_name = 'catalog/index.html'
+    context_object_name = 'products'
+    queryset = Product.objects.all()[:6]
 
 
-def catalog(request):
-    category_id = request.GET.get('category')
+class CatalogView(ListView):
+    model = Product
+    template_name = 'catalog/catalog.html'
+    context_object_name = 'products'
 
-    if category_id:
-        products = Product.objects.filter(category_id=category_id)
-    else:
-        products = Product.objects.all()
+    def get_queryset(self):
+        category_id = self.request.GET.get('category')
+        if category_id:
+            return Product.objects.filter(category_id=category_id)
+        return super().get_queryset()
 
-    categories = Category.objects.all()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+        context['current_category'] = self.request.GET.get('category')
+        return context
 
-    return render(request, 'catalog.html', {
-        'products': products,
-        'categories': categories,
-        'current_category': category_id
-    })
 
-def contacts(request):
-    return render(request, 'contacts.html')
+class ContactsView(TemplateView):
+    template_name = 'catalog/contacts.html'
 
-def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk)
-    return render(request, 'product_detail.html', {'product': product})
+
+class ProductDetailView(DetailView):
+    model = Product
+    template_name = 'catalog/product_detail.html'
+    context_object_name = 'product'
+    pk_url_kwarg = 'pk'
+
