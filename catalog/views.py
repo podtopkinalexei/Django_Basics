@@ -1,6 +1,8 @@
-from django.views.generic import ListView, DetailView, TemplateView
-from django.shortcuts import get_object_or_404
-from catalog.models import Product, Category
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, TemplateView, CreateView, UpdateView, DeleteView
+
+from .forms import ProductForm
+from .models import Product, Category
 
 
 class IndexView(ListView):
@@ -8,7 +10,6 @@ class IndexView(ListView):
     template_name = 'catalog/index.html'
     context_object_name = 'products'
     queryset = Product.objects.all()[:6]
-
 
 class CatalogView(ListView):
     model = Product
@@ -27,10 +28,8 @@ class CatalogView(ListView):
         context['current_category'] = self.request.GET.get('category')
         return context
 
-
 class ContactsView(TemplateView):
     template_name = 'catalog/contacts.html'
-
 
 class ProductDetailView(DetailView):
     model = Product
@@ -38,3 +37,22 @@ class ProductDetailView(DetailView):
     context_object_name = 'product'
     pk_url_kwarg = 'pk'
 
+
+class ProductCreateView(CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('catalog:catalog')
+
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = 'catalog/product_form.html'
+    success_url = reverse_lazy('catalog:catalog')
+
+
+class ProductDeleteView(DeleteView):
+    model = Product
+    template_name = 'catalog/product_confirm_delete.html'
+    success_url = reverse_lazy('catalog:catalog')
