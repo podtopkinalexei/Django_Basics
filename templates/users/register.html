@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация аккаунта</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .register-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+        
+        .register-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .register-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .register-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .register-content {
+            padding: 30px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        .form-label .required {
+            color: #e53e3e;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-input::placeholder {
+            color: #a0aec0;
+        }
+        
+        .form-input.error {
+            border-color: #e53e3e;
+        }
+        
+        .form-help {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .error-list {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #f56565;
+        }
+        
+        .error-list ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .error-list li {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .error-list li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .password-strength {
+            margin-top: 5px;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        
+        .strength-weak { background: #e53e3e; width: 33%; }
+        .strength-medium { background: #d69e2e; width: 66%; }
+        .strength-strong { background: #38a169; width: 100%; }
+        
+        .strength-text {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 3px;
+        }
+        
+        .btn-register {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px 0;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-register:active {
+            transform: translateY(0);
+        }
+        
+        .btn-register:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .terms-agreement {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .terms-agreement input {
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        
+        .terms-agreement label {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.4;
+        }
+        
+        .terms-agreement a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .terms-agreement a:hover {
+            text-decoration: underline;
+        }
+        
+        .register-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .register-links a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .register-links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #a0aec0;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+        
+        .divider span {
+            padding: 0 15px;
+            font-size: 14px;
+        }
+        
+        .social-register {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .social-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .social-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .social-btn.google {
+            color: #db4437;
+        }
+        
+        .social-btn.github {
+            color: #333;
+        }
+        
+        @media (max-width: 480px) {
+            .register-container {
+                margin: 10px;
+            }
+            
+            .register-content {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-register {
+                flex-direction: column;
+            }
+        }
+        
+        /* Анимации */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .register-container {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h1>Создайте аккаунт</h1>
+            <p>Присоединяйтесь к нашему сообществу</p>
+        </div>
+        
+        <div class="register-content">
+            {% if form.errors %}
+            <div class="error-list">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <form method="post" id="registerForm">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id_first_name" class="form-label">Имя</label>
+                        <input type="text" name="first_name" id="id_first_name" class="form-input" 
+                               placeholder="Ваше имя" value="{{ form.first_name.value|default:'' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_last_name" class="form-label">Фамилия</label>
+                        <input type="text" name="last_name" id="id_last_name" class="form-input" 
+                               placeholder="Ваша фамилия" value="{{ form.last_name.value|default:'' }}">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_email" class="form-label"><span class="required">*</span> Email</label>
+                    <input type="email" name="email" id="id_email" class="form-input" 
+                           placeholder="example@mail.com" required
+                           value="{{ form.email.value|default:'' }}">
+                    <span class="form-help">Будет использоваться для входа в аккаунт</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_phone_number" class="form-label">Телефон</label>
+                    <input type="tel" name="phone_number" id="id_phone_number" class="form-input" 
+                           placeholder="+7 (999) 999-99-99"
+                           value="{{ form.phone_number.value|default:'' }}">
+                </div>               
+
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id_password1" class="form-label"><span class="required">*</span> Пароль</label>
+                        <input type="password" name="password1" id="id_password1" class="form-input" 
+                               placeholder="Создайте пароль" required>
+                        <div class="password-strength">
+                            <div class="strength-bar" id="passwordStrengthBar"></div>
+                        </div>
+                        <div class="strength-text" id="passwordStrengthText">Введите пароль</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="id_password2" class="form-label"><span class="required">*</span> Подтверждение</label>
+                        <input type="password" name="password2" id="id_password2" class="form-input" 
+                               placeholder="Повторите пароль" required>
+                        <span class="form-help">Пароли должны совпадать</span>
+                    </div>
+                </div>  
+                <button type="submit" class="btn-register" id="registerBtn">Создать аккаунт</button>
+            </form>            
+
+            <div class="register-links">
+                <p>Уже есть аккаунт? <a href="{% url 'users:login' %}">Войти</a></p>
+                <p><a href="{% url 'catalog:index' %}">← Вернуться на главную</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('id_password1');
+            const confirmInput = document.getElementById('id_password2');
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+            const registerBtn = document.getElementById('registerBtn');
+            
+            // Проверка сложности пароля
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                let text = '';
+                let className = '';
+                
+                if (password.length > 0) {
+                    if (password.length < 6) {
+                        strength = 1;
+                        text = 'Слишком короткий';
+                        className = 'strength-weak';
+                    } else {
+                        // Проверяем сложность
+                        if (/[a-z]/.test(password)) strength++;
+                        if (/[A-Z]/.test(password)) strength++;
+                        if (/[0-9]/.test(password)) strength++;
+                        if (/[^a-zA-Z0-9]/.test(password)) strength++;
+                        
+                        if (strength === 1) {
+                            text = 'Слабый';
+                            className = 'strength-weak';
+                        } else if (strength === 2) {
+                            text = 'Средний';
+                            className = 'strength-medium';
+                        } else if (strength >= 3) {
+                            text = 'Сильный';
+                            className = 'strength-strong';
+                        }
+                    }
+                } else {
+                    text = 'Введите пароль';
+                    className = '';
+                }
+                
+                strengthBar.className = 'strength-bar ' + className;
+                strengthText.textContent = text;
+            });
+            
+            // Проверка совпадения паролей
+            confirmInput.addEventListener('input', function() {
+                if (passwordInput.value !== this.value && this.value.length > 0) {
+                    this.classList.add('error');
+                } else {
+                    this.classList.remove('error');
+                }
+            });
+            
+            // Валидация телефона
+            const phoneInput = document.getElementById('id_phone_number');
+            phoneInput.addEventListener('input', function() {
+                this.value = this.value.replace(/[^0-9+()-\s]/g, '');
+            });
+            
+            // Валидация email
+            const emailInput = document.getElementById('id_email');
+            emailInput.addEventListener('blur', function() {
+                const email = this.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (email && !emailRegex.test(email)) {
+                    this.classList.add('error');
+                    this.classList.add('shake');
+                    setTimeout(() => this.classList.remove('shake'), 500);
+                } else {
+                    this.classList.remove('error');
+                }
+            });
+            
+            // Валидация формы перед отправкой
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                let isValid = true;
+                
+                // Проверка email
+                const email = emailInput.value;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    emailInput.classList.add('error', 'shake');
+                    isValid = false;
+                    setTimeout(() => emailInput.classList.remove('shake'), 500);
+                }
+                
+                // Проверка паролей
+                if (passwordInput.value !== confirmInput.value) {
+                    confirmInput.classList.add('error', 'shake');
+                    isValid = false;
+                    setTimeout(() => confirmInput.classList.remove('shake'), 500);
+                }
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    registerBtn.classList.add('shake');
+                    setTimeout(() => registerBtn.classList.remove('shake'), 500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

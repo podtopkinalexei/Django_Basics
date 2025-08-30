@@ -1,0 +1,83 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{% if object %}Редактировать запись{% else %}Новая запись{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">
+                        {% if object %}
+                            <i class="bi bi-pencil-square"></i> Редактировать запись
+                        {% else %}
+                            <i class="bi bi-plus-circle"></i> Новая запись
+                        {% endif %}
+                    </h2>
+                    
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label">Заголовок</label>
+                            {{ form.title }}
+                            <div class="invalid-feedback">
+                                Пожалуйста, введите заголовок.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_content" class="form-label">Содержание</label>
+                            {{ form.content }}
+                            <div class="invalid-feedback">
+                                Пожалуйста, введите содержание.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_preview" class="form-label">Превью</label>
+                            {{ form.preview }}
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            {{ form.is_published }}
+                            <label class="form-check-label" for="id_is_published">Опубликовано</label>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary-custom">
+                                <i class="bi bi-save"></i> Сохранить
+                            </button>
+                            <a href="{% if object %}{% url 'blog:post_detail' object.pk %}{% else %}{% url 'blog:post_list' %}{% endif %}" 
+                               class="btn btn-outline-secondary">
+                                Отмена
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Пример валидации формы
+(function () {
+  'use strict'
+  
+  const forms = document.querySelectorAll('.needs-validation')
+  
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+      
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}
