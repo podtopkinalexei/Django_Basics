@@ -1,0 +1,153 @@
+{% extends 'catalog/base.html' %}
+{% load i18n %}
+
+{% block title %}Публикация продукта{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h2 class="mb-0">
+                        <i class="bi bi-check-circle"></i>
+                        Публикация продукта
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <h5 class="alert-heading">Публикация продукта</h5>
+                        <p class="mb-0">Вы собираетесь опубликовать продукт. После публикации он станет видимым в каталоге для всех пользователей.</p>
+                    </div>
+
+                    <div class="product-info mb-4">
+                        <h4>Информация о продукте:</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Название:</strong> {{ product.name }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Цена:</strong> {{ product.price }} руб.
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <strong>Категория:</strong> {{ product.category.name|default:"Не указана" }}
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Текущий статус:</strong>
+                                <span class="badge bg-{% if product.publish_status == 'draft' %}secondary{% else %}danger{% endif %}">
+                                    {{ product.get_publish_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        {% if product.owner %}
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <strong>Владелец:</strong> {{ product.owner.email }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-4">
+                        <h5>Последствия публикации:</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">
+                                <i class="bi bi-eye text-success"></i>
+                                Продукт станет видимым в публичном каталоге
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-people text-primary"></i>
+                                Все пользователи смогут просматривать продукт
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-check-circle text-success"></i>
+                                Статус изменится на "Опубликовано"
+                            </li>
+                            <li class="list-group-item">
+                                <i class="bi bi-cart text-info"></i>
+                                Продукт будет доступен для покупки
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Проверка продукта перед публикацией -->
+                    <div class="mb-4">
+                        <h5>Проверка перед публикацией:</h5>
+                        <div class="list-group">
+                            <div class="list-group-item {% if product.name %}list-group-item-success{% else %}list-group-item-danger{% endif %}">
+                                <i class="bi {% if product.name %}bi-check-circle{% else %}bi-exclamation-circle{% endif %}"></i>
+                                Название продукта: {% if product.name %}✓ Заполнено{% else %}✗ Не заполнено{% endif %}
+                            </div>
+                            <div class="list-group-item {% if product.price %}list-group-item-success{% else %}list-group-item-danger{% endif %}">
+                                <i class="bi {% if product.price %}bi-check-circle{% else %}bi-exclamation-circle{% endif %}"></i>
+                                Цена: {% if product.price %}✓ Указана{% else %}✗ Не указана{% endif %}
+                            </div>
+                            <div class="list-group-item {% if product.description %}list-group-item-success{% else %}list-group-item-warning{% endif %}">
+                                <i class="bi {% if product.description %}bi-check-circle{% else %}bi-exclamation-circle{% endif %}"></i>
+                                Описание: {% if product.description %}✓ Заполнено{% else %}⚠ Рекомендуется добавить{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="publish_notes" class="form-label">
+                                <strong>Заметки к публикации (необязательно):</strong>
+                            </label>
+                            <textarea class="form-control" id="publish_notes" name="publish_notes" 
+                                      rows="2" placeholder="Дополнительные заметки..."></textarea>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'catalog:product_detail' product.pk %}" 
+                               class="btn btn-secondary me-md-2">
+                                <i class="bi bi-arrow-left"></i>
+                                Вернуться к продукту
+                            </a>
+                            <button type="submit" class="btn btn-success" 
+                                    {% if not product.name or not product.price %}disabled{% endif %}>
+                                <i class="bi bi-check-circle"></i>
+                                Подтвердить публикацию
+                            </button>
+                        </div>
+                        
+                        {% if not product.name or not product.price %}
+                        <div class="alert alert-danger mt-3">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Нельзя опубликовать продукт без названия или цены. 
+                            <a href="{% url 'catalog:product_update' product.pk %}" class="alert-link">
+                                Редактировать продукт
+                            </a>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Добавляем иконки Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+    .product-info {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+    }
+    .list-group-item {
+        display: flex;
+        align-items: center;
+    }
+    .list-group-item i {
+        margin-right: 10px;
+        font-size: 1.2em;
+    }
+</style>
+{% endblock %}
