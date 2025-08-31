@@ -1,4 +1,5 @@
 {% extends 'catalog/base.html' %}
+{% load i18n %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
@@ -15,6 +16,10 @@
         <h1>{{ product.name }}</h1>
         <h3 class="text-primary">{{ product.price }} руб.</h3>
         <p class="text-muted">Категория: {{ product.category.name }}</p>
+        <p class="text-muted">Статус: {{ product.get_publish_status_display }}</p>
+        {% if product.owner %}
+        <p class="text-muted">Владелец: {{ product.owner.email }}</p>
+        {% endif %}
         
         <h4 class="mt-4">Описание</h4>
         <p>{{ product.description }}</p>
@@ -22,12 +27,28 @@
         <div class="mt-4">
             <button class="btn btn-primary btn-lg">Добавить в корзину</button>
         </div>
+        
+        <!-- Кнопки действий -->
         <div class="mt-4">
-            <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">Редактировать</a>
-            <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>            
+            {% if user == product.owner or user.is_staff %}
+                <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">Редактировать</a>
+            {% endif %}
+            
+            {% if user == product.owner or user.is_staff %}
+                <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
+            {% endif %}
+            
+            {% if user.is_staff and product.is_published %}
+                <a href="{% url 'catalog:product_unpublish' product.pk %}" class="btn btn-warning">Отменить публикацию</a>
+            {% endif %}
+            
+            {% if user.is_staff and not product.is_published %}
+                <a href="{% url 'catalog:product_publish' product.pk %}" class="btn btn-success">Опубликовать</a>
+            {% endif %}
         </div>
+        
         <div class="mt-4">
-            <a class="btn btn-info mt-3" href="{% url 'catalog:catalog' %}">Вернуться</a>
+            <a class="btn btn-info mt-3" href="{% url 'catalog:catalog' %}">Вернуться в каталог</a>
         </div>
     </div>
 </div>
@@ -38,13 +59,20 @@
         <tbody>
             <tr>
                 <th scope="row">Дата добавления</th>
-                <td>{{ product.created_at|date:"d.m.Y" }}</td>
+                <td>{{ product.created_at|date:"d.m.Y H:i" }}</td>
             </tr>
             <tr>
                 <th scope="row">Дата обновления</th>
-                <td>{{ product.updated_at|date:"d.m.Y" }}</td>
+                <td>{{ product.updated_at|date:"d.m.Y H:i" }}</td>
             </tr>
-            <!-- Место для дополнительных характеристик -->
+            <tr>
+                <th scope="row">Статус публикации</th>
+                <td>
+                    <span class="badge {% if product.publish_status == 'published' %}bg-success{% elif product.publish_status == 'rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
+                        {{ product.get_publish_status_display }}
+                    </span>
+                </td>
+            </tr>
         </tbody>
     </table>
 </div>

@@ -19,7 +19,39 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'blog:post_list' %}">Блог</a>
                 </li>
+                
+                <!-- Меню модератора -->
+                    {% if user.is_authenticated and user.is_staff %}
+                    <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="moderationDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Модерация
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="moderationDropdown">
+                        <li><a class="dropdown-item" href="{% url 'catalog:catalog' %}?status=rejected">
+                            <i class="bi bi-x-circle"></i> Отклоненные
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'catalog:catalog' %}?status=published">
+                            <i class="bi bi-check-circle"></i> Опубликованные
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'catalog:product_create' %}">
+                            <i class="bi bi-plus-circle"></i> Создать продукт
+                        </a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                
+                <!-- Меню для обычных пользователей -->
+                {% if user.is_authenticated and not user.is_staff %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'catalog:product_create' %}">
+                        <i class="bi bi-plus-circle"></i> Добавить продукт
+                    </a>
+                </li>
+                {% endif %}
             </ul>
+            
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
@@ -27,32 +59,80 @@
                            data-bs-toggle="dropdown" aria-expanded="false">
                             {% if user.avatar %}
                                 <img src="{{ user.avatar.url }}" alt="Avatar" class="rounded-circle" width="30" height="30">
+                            {% else %}
+                                <i class="bi bi-person-circle"></i>
                             {% endif %}
                             {{ user.email }}
+                            {% if user.is_staff %}
+                                <span class="badge bg-info ms-1">Модератор</span>
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">Профиль</a></li>
-                            <li><a class="dropdown-item" href="{% url 'users:profile_edit' %}">Редактировать профиль</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
+                            <!-- Бейдж роли в меню -->
+                            {% if user.is_staff %}
+                            <li class="dropdown-item-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-shield-check"></i> Модератор продуктов
+                                </small>
                             </li>
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            
+                            <li><a class="dropdown-item" href="{% url 'users:profile' %}">
+                                <i class="bi bi-person"></i> Профиль
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'users:profile_edit' %}">
+                                <i class="bi bi-pencil"></i> Редактировать профиль
+                            </a></li>
+                            
+                            <!-- Ссылка на мои продукты для обычных пользователей -->
+                            {% if user.is_authenticated and not user.is_staff %}
+                            <li><a class="dropdown-item" href="{% url 'catalog:catalog' %}?owner={{ user.id }}">
+                                <i class="bi bi-box"></i> Мои продукты
+                            </a></li>
+                            {% endif %}
+                            
+                            <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{% url 'users:logout' %}" method="post" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="dropdown-item">Выйти</button>
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right"></i> Выйти
+                                    </button>
                                 </form>
                             </li>
                         </ul>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+                        <a class="nav-link" href="{% url 'users:login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> Войти
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:register' %}">Регистрация</a>
+                        <a class="nav-link" href="{% url 'users:register' %}">
+                            <i class="bi bi-person-plus"></i> Регистрация
+                        </a>
                     </li>
                 {% endif %}
             </ul>
         </div>
     </div>
 </nav>
+
+<!-- Добавляем иконки Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+<style>
+    .badge {
+        font-size: 0.7em;
+    }
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+    }
+    .dropdown-item i {
+        margin-right: 8px;
+        width: 16px;
+    }
+</style>

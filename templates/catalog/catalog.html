@@ -1,4 +1,5 @@
 {% extends 'catalog/base.html' %}
+{% load i18n %}
 
 {% block title %}Каталог{% endblock %}
 
@@ -13,43 +14,97 @@
             </div>
             <ul class="list-group list-group-flush">
                 <li class="list-group-item {% if not request.GET.category %}active{% endif %}">
-                    <a href="{% url 'catalog:catalog' %}" class="text-decoration-none">Все товары</a>
+                    <a href="{% url 'catalog:catalog' %}" class="text-decoration-none text-dark">Все товары</a>
                 </li>
                 {% for category in categories %}
                 <li class="list-group-item {% if request.GET.category == category.id|stringformat:'s' %}active{% endif %}">
-                    <a href="{% url 'catalog:catalog' %}?category={{ category.id }}" 
-                       class="text-decoration-none">
+                    <a href="{% url 'catalog:catalog' %}?category={{ category.id }}"
+                       class="text-decoration-none text-dark">
                        {{ category.name }}
                     </a>
                 </li>
                 {% endfor %}
             </ul>
         </div>
+
+        <!-- Фильтр по статусу публикации (для модераторов) -->
+        {% if user.is_staff %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    Статус публикации
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item {% if not request.GET.status %}active{% endif %}">
+                        <a href="
+                                {% url 'catalog:catalog' %}{% if request.GET.category %}?category={{ request.GET.category }}{% endif %}"
+                           class="text-decoration-none text-dark">Все статусы</a>
+                    </li>
+                    <li class="list-group-item {% if request.GET.status == 'published' %}active{% endif %}">
+                        <a href="{% url 'catalog:catalog' %}?status=published{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+                           class="text-decoration-none text-dark">Опубликованные</a>
+                    </li>
+                    <li class="list-group-item {% if request.GET.status == 'draft' %}active{% endif %}">
+                        <a href="{% url 'catalog:catalog' %}?status=draft{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+                           class="text-decoration-none text-dark">Черновики</a>
+                    </li>
+                    <li class="list-group-item {% if request.GET.status == 'rejected' %}active{% endif %}">
+                        <a href="{% url 'catalog:catalog' %}?status=rejected{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+                           class="text-decoration-none text-dark">Отклоненные</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+        
         <div class="mb-3">
-            <a href="{% url 'catalog:product_create' %}" class="btn btn-success">Добавить продукт</a>
+            <a href="{% url 'catalog:product_create' %}" class="btn btn-success w-100">Добавить продукт</a>
         </div>
     </div>
+
     <div class="col-md-9">
+        <!-- Бейджи статусов -->
+        <div class="mb-3">
+            {% for product in products %}
+                {% if product.publish_status != 'published' and user.is_staff %}
+                    <span class="badge bg-warning">Требует модерации</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+
         <div class="row">
             {% for product in products %}
-            <div class="col-md-4 mb-4">
-                <div class="card product-card">
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" class="card-img-top product-img" alt="{{ product.name }}">
-                    {% else %}
-                    <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top product-img" alt="No image">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ product.name }}</h5>
-                        <p class="card-text">{{ product.price }} руб.</p>
-                        <a href="{% url 'catalog:product_detail' product.id %}" class="btn btn-primary">Подробнее</a>
+                <div class="col-md-4 mb-4">
+                    <div class="card product-card">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="card-img-top product-img"
+                                 alt="{{ product.name }}">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x200?text=No+Image"
+                                 class="card-img-top product-img" alt="No image">
+                        {% endif %}
+
+                        <!-- Бейдж статуса -->
+                        {% if product.publish_status != 'published' and user.is_authenticated and user.is_staff %}
+                            <div class="position-absolute top-0 end-0 m-2">
+                                <span class="badge bg-warning">{{ product.get_publish_status_display }}</span>
+                            </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">{{ product.price }} руб.</p>
+
+                            <!-- Статус для обычных пользователей -->
+                            {% if not product.is_published %}
+                                <div class="alert alert-warning py-1 mb-2" role="alert">
+                                    <small>На модерации</small>
+                                </div>
+                            {% endif %}
+
+                            <a href="{% url 'catalog:product_detail' product.id %}"
+                               class="btn btn-primary">Подробнее</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info">Товары не найдены.</div>
-            </div>
             {% endfor %}
         </div>
     </div>

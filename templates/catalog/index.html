@@ -21,9 +21,25 @@
             {% else %}
             <img src="https://via.placeholder.com/300x200?text=No+Image" class="card-img-top product-img" alt="No image">
             {% endif %}
+            
+            <!-- Бейдж статуса для модераторов -->
+            {% if product.publish_status != 'published' and user.is_authenticated and user.is_staff %}
+                <div class="position-absolute top-0 end-0 m-2">
+                    <span class="badge bg-warning">{{ product.get_publish_status_display }}</span>
+                </div>
+            {% endif %}
+            
             <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
                 <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                
+                <!-- Статус для обычных пользователей -->
+                {% if not product.is_published %}
+                <div class="alert alert-warning py-1 mb-2" role="alert">
+                    <small>На модерации</small>
+                </div>
+                {% endif %}
+                
                 <a href="{% url 'catalog:product_detail' product.id %}" class="btn btn-primary">Подробнее</a>
             </div>
         </div>

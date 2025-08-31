@@ -14,10 +14,18 @@
                     <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
                         
+                        <!-- Информация о владельце для редактирования -->
+                        {% if object and object.owner %}
+                        <div class="alert alert-info">
+                            <small>Владелец продукта: {{ object.owner.email }}</small>
+                        </div>
+                        {% endif %}
+                        
                         {% for field in form %}
                             <div class="mb-3">
                                 <label for="{{ field.id_for_label }}" class="form-label">
                                     {{ field.label }}
+                                    {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
                                 </label>
                                 {{ field }}
                                 {% if field.errors %}
@@ -34,7 +42,8 @@
                         {% endfor %}
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% url 'catalog:catalog' %}" class="btn btn-secondary me-md-2">Отмена</a>
+                            <a href="{% if object %}{% url 'catalog:product_detail' object.pk %}{% else %}{% url 'catalog:catalog' %}{% endif %}" 
+                               class="btn btn-secondary me-md-2">Отмена</a>
                             <button type="submit" class="btn btn-primary">Сохранить</button>
                         </div>
                     </form>

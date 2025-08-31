@@ -1,4 +1,5 @@
 {% extends 'catalog/base.html' %}
+{% load i18n %}
 
 {% block title %}Удаление продукта{% endblock %}
 
@@ -13,10 +14,17 @@
                 <div class="card-body">
                     <p>Вы уверены, что хотите удалить продукт "{{ object.name }}"?</p>
                     
+                    <!-- Информация о владельце -->
+                    {% if object.owner %}
+                    <div class="alert alert-warning">
+                        <small>Владелец: {{ object.owner.email }}</small>
+                    </div>
+                    {% endif %}
+                    
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="{% url 'catalog:catalog' %}" class="btn btn-secondary me-md-2">Отмена</a>
+                            <a href="{% url 'catalog:product_detail' object.pk %}" class="btn btn-secondary me-md-2">Отмена</a>
                             <button type="submit" class="btn btn-danger">Удалить</button>
                         </div>
                     </form>
