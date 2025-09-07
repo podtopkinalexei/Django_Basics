@@ -1,0 +1,87 @@
+{% extends 'catalog/base.html' %}
+{% load i18n %}
+
+{% block title %}Продукты в категории{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <!-- Боковая панель с категориями -->
+            <div class="col-md-3">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Категории</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'catalog:catalog' %}"
+                           class="list-group-item list-group-item-action {% if not current_category %}active{% endif %}">
+                            Все товары
+                        </a>
+                        {% for item in categories %}
+                            <a href="{% url 'catalog:category_products' item.category.slug %}"
+                               class="list-group-item list-group-item-action {% if current_category == item.category.slug %}active{% endif %}">
+                                {{ item.category.name }}
+                                <span class="badge bg-primary rounded-pill float-end">{{ item.product_count }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Основной контент -->
+            <div class="col-md-9">
+                <h1 class="mb-4">
+                    {% if current_category %}
+                        {% for item in categories %}
+                            {% if item.category.slug == current_category %}
+                                Продукты в категории: {{ item.category.name }}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        Все продукты
+                    {% endif %}
+                </h1>
+
+                {% if products %}
+                    <div class="row">
+                        {% for product in products %}
+                            <div class="col-md-4 mb-4">
+                                <div class="card product-card">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" class="card-img-top product-img"
+                                             alt="{{ product.name }}">
+                                    {% else %}
+                                        <img src="https://via.placeholder.com/300x200?text=No+Image"
+                                             class="card-img-top product-img" alt="No image">
+                                    {% endif %}
+
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ product.name }}</h5>
+                                        <p class="card-text text-primary fw-bold">{{ product.price }} руб.</p>
+                                        <p class="card-text small text-muted">
+                                            Категория: {{ product.category.name }}
+                                        </p>
+
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <a href="{% url 'catalog:product_detail' product.id %}"
+                                               class="btn btn-sm btn-primary">Подробнее</a>
+                                            {% if not product.is_published %}
+                                                <span class="badge bg-warning">На модерации</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <h4>Продукты не найдены</h4>
+                        <p>В данной категории пока нет доступных продуктов.</p>
+                        <a href="{% url 'catalog:catalog' %}" class="btn btn-primary">Вернуться в каталог</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

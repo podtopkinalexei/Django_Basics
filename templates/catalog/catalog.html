@@ -18,7 +18,7 @@
                 </li>
                 {% for category in categories %}
                 <li class="list-group-item {% if request.GET.category == category.id|stringformat:'s' %}active{% endif %}">
-                    <a href="{% url 'catalog:catalog' %}?category={{ category.id }}"
+                    <a href="{% url 'catalog:category_products' category.slug %}">
                        class="text-decoration-none text-dark">
                        {{ category.name }}
                     </a>
