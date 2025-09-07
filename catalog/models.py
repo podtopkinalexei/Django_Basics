@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.text import slugify
 
 User = get_user_model()
+
 
 
 class Category(models.Model):
     """Модель категории товаров"""
     name = models.CharField(max_length=100, verbose_name='Наименование')
+    slug = models.SlugField(max_length=100, unique=True, verbose_name='URL', blank=True)
     description = models.TextField(verbose_name='Описание', blank=True, null=True)
 
     class Meta:
@@ -16,6 +19,11 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 class Product(models.Model):
