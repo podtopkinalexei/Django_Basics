@@ -10,7 +10,7 @@ from django.views.generic import ListView, DetailView, TemplateView, CreateView,
 
 from catalog.forms import ProductForm
 from catalog.models import Product
-from .services import get_products_by_category, get_categories_with_products
+from .services import get_products_by_category, get_categories_with_products, get_all_products
 
 
 class OwnerRequiredMixin(UserPassesTestMixin):
@@ -38,8 +38,8 @@ class IndexView(ListView):
     context_object_name = 'products'
 
     def get_queryset(self):
-        all_products = get_products_by_category()
-        return all_products[:6]  # Берем первые 6 продуктов
+        all_products = get_all_products()
+        return all_products[:6]
 
 class CatalogView(ListView):
     model = Product
@@ -51,10 +51,11 @@ class CatalogView(ListView):
         status = self.request.GET.get('status')
 
         if not self.request.user.is_staff:
-            all_products = get_products_by_category()
+
+            all_products = get_all_products()
 
             if category_id:
-                return all_products.filter(category_id=category_id)
+                return [p for p in all_products if p.category_id == int(category_id)]
             return all_products
 
         products = Product.objects.all().select_related('category')
@@ -78,14 +79,12 @@ class CatalogView(ListView):
 class ContactsView(TemplateView):
     template_name = 'catalog/contacts.html'
 
-
 @method_decorator(cache_page(300), name='dispatch')  # Кеширование на 5 минут
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = 'catalog/product_detail.html'
     context_object_name = 'product'
     pk_url_kwarg = 'pk'
-
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
     model = Product
@@ -102,7 +101,6 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, _('Продукт успешно создан!'))
         return super().form_valid(form)
 
-
 class ProductUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
     model = Product
     form_class = ProductForm
@@ -118,7 +116,6 @@ class ProductUpdateView(LoginRequiredMixin, OwnerRequiredMixin, UpdateView):
         messages.success(self.request, _('Продукт успешно обновлен!'))
         return super().form_valid(form)
 
-
 class ProductDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     model = Product
     template_name = 'catalog/product_confirm_delete.html'
@@ -127,7 +124,6 @@ class ProductDeleteView(LoginRequiredMixin, OwnerRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(request, _('Продукт успешно удален!'))
         return super().delete(request, *args, **kwargs)
-
 
 class ProductUnpublishView(LoginRequiredMixin, ModeratorRequiredMixin, UpdateView):
     model = Product
