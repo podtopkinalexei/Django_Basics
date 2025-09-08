@@ -1,0 +1,41 @@
+[
+{
+  "model": "catalog.product",
+  "pk": 1,
+  "fields": {
+    "name": "iPhone 15 Pro",
+    "description": "Флагманский смартфон от Apple",
+    "image": "",
+    "category": 1,
+    "price": "94990.00",
+    "created_at": "2025-08-03T07:52:24.151Z",
+    "updated_at": "2025-08-03T07:55:35.639Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 2,
+  "fields": {
+    "name": "Samsung Galaxy S23",
+    "description": "Флагманский смартфон от Samsung",
+    "image": "",
+    "category": 1,
+    "price": "89990.00",
+    "created_at": "2025-08-03T07:52:24.158Z",
+    "updated_at": "2025-08-03T07:52:24.158Z"
+  }
+},
+{
+  "model": "catalog.product",
+  "pk": 3,
+  "fields": {
+    "name": "iPad Pro",
+    "description": "Планшет от Apple",
+    "image": "",
+    "category": 2,
+    "price": "74990.00",
+    "created_at": "2025-08-03T07:52:24.159Z",
+    "updated_at": "2025-08-03T07:52:24.159Z"
+  }
+}
+]
